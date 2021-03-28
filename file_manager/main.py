@@ -9,10 +9,7 @@ class FileManager:
         self.file = file
 
     def create(self):
-        if os.path.exists("%s/logs/%s" %(os.getcwd(), self.file)):
-            open("%s/logs/%s" %(os.getcwd(), self.file), 'a').close()
-        else:
-            print("File already exist")
+        open("%s/logs/%s" %(os.getcwd(), self.file), 'a').close()
     
     def delete(self):
         if os.path.exists("%s/logs/%s" %(os.getcwd(), self.file)):
