@@ -4,5 +4,6 @@ setup(name='auto-man-system',
     packages=find_packages(),
     install_requires=[
         'psutil',
-        'pandas'
+        'pandas',
+        'tk'
     ])
