@@ -53,3 +53,11 @@ class Server:
                 print(f"# Disconnected: {address}")
                 break
         client.close()
+    
+    def __execute(self, msg):
+        pass
+
+
+if __name__ == "__main__":
+    server = Server()
+    server.start()
