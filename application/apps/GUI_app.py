@@ -9,7 +9,7 @@ class App:
 
         # ventana principal
         ventana = Tk()
-        ventana.title("An App")
+        ventana.title("App 1")
         ventana.configure(bg='#252526')
         ventana.resizable(False, False)
         #self.img = PhotoImage(file='icon.png')

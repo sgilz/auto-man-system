@@ -5,15 +5,7 @@ import pandas as pd
 import time
 import os
 import argparse
-
-def get_size(bytes):
-    """
-    Returns size of bytes in a nice format
-    """
-    for unit in ['', 'K', 'M', 'G', 'T', 'P']:
-        if bytes < 1024:
-            return f"{bytes:.2f}{unit}B"
-        bytes /= 1024
+import json
 
 class AppHandler:
     """
@@ -24,9 +16,32 @@ class AppHandler:
         self.__processes = []
 
     def get_processes_info(self):
+        """
+        Returns a list of dictionaries with the next info about the running processes:
+            {
+                'pid': pid, 
+                'name': name, 
+                'create_time': create_time,
+                'cores': cores,
+                'cpu_usage': cpu_usage,
+                'status': status,
+                'nice': nice,
+                'memory_usage': memory_usage,
+                'username': username
+            }
+        
+        In case the process does not exist, it returns an error message for that process.
+        """
+
         # the list the contain all process dictionaries
         processes = []
-        for process in psutil.process_iter():
+        for pid in self.__processes:
+            try:
+                process = psutil.Process(pid)
+            except psutil.NoSuchProcess as e:
+                processes.append({"error": f"{e}"})
+                continue
+
             # get all process info in one shot
             with process.oneshot():
                 # get the process id
@@ -85,22 +100,7 @@ class AppHandler:
                     'username': username
                 })
 
-        return processes
-
-    def construct_dataframe(self, processes):
-        # convert to pandas dataframe
-        df = pd.DataFrame(processes)
-        # set the process id as index of a process
-        df.set_index('pid', inplace=True)
-        # sort rows by the column passed as argument
-        df.sort_values(sort_by, inplace=True, ascending=not descending)
-        # pretty printing bytes
-        df['memory_usage'] = df['memory_usage'].apply(get_size)
-        # convert to proper date format
-        df['create_time'] = df['create_time'].apply(datetime.strftime, args=("%Y-%m-%d %H:%M:%S",))
-        # reorder and define used columns
-        df = df[columns.split(",")]
-        return df
+        return json.dumps(processes)
 
     def run(self, params = ["python", os.path.dirname(os.path.realpath(__file__))+"apps/GUI_app.py"] ):
         """
@@ -109,9 +109,9 @@ class AppHandler:
         ['python3', '-m', 'venv', 'env'] 
         ["/usr/bin/python", "-c", "print('hello')"]
         """
-        p = psutil.Popen(params, stdout=PIPE)
-        return p.pid
-
+        for _ in range(2):
+            p = psutil.Popen(params, stdout=PIPE)
+            self.__processes.append(p.pid)
 
     def set_priority(self, priority_id, pid):
         """
@@ -120,6 +120,7 @@ class AppHandler:
         if there is not process associated to the PID, 
         an error message is returned.
         """
+        priority_id = priority_id if -20 <= priority_id <= 19 else 0
         try:
             if pid in self.__processes:
                 process = psutil.Process(pid)
@@ -167,7 +168,6 @@ class AppHandler:
         """
         for pid in self.__processes:
             self.terminate(pid)
-        exit(0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process Viewer & Monitor")
@@ -182,29 +182,3 @@ if __name__ == "__main__":
 
     # parse arguments
     args = parser.parse_args()
-    columns = args.columns
-    sort_by = args.sort_by
-    descending = args.descending
-    n = int(args.n)
-    live_update = args.live_update
-
-    # print the processes for the first time
-    handler = AppHandler()
-    processes = handler.get_processes_info()
-    df = handler.construct_dataframe(processes)
-    if n == 0:
-        print(df.to_string())
-    elif n > 0:
-        print(df.head(n).to_string())
-    # print continuously
-    while live_update:
-        # get all process info
-        processes = handler.get_processes_info()
-        df = handler.construct_dataframe(processes)
-        # clear the screen depending on your OS
-        os.system("cls") if "nt" in os.name else os.system("clear")
-        if n == 0:
-            print(df.to_string())
-        elif n > 0:
-            print(df.head(n).to_string())
-        time.sleep(0.7)

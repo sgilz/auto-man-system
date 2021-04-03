@@ -15,7 +15,7 @@ class Message:
         self.__cmd = msg_dict["cmd"]
         self.__src = msg_dict["src"]
         self.__dst = msg_dict["dst"]
-        self.__msg = msg_dict["msg"]
+        self.__msg = str(msg_dict["msg"])
 
     def get_cmd(self):
         return self.__cmd
@@ -40,5 +40,18 @@ class Message:
 
     def set_msg(self, msg):
         self.__msg = msg
+    
+    @staticmethod
+    def format(cmd, src, dst, msg):
+        """
+        Sets a message to have a unified format for the entire system.
+        """
+        mgs_dict = {
+            "cmd": cmd,
+            "src": src,
+            "dst": dst,
+            "msg": msg
+        }
+        return json.dumps(mgs_dict)
 
     
