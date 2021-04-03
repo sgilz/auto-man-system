@@ -4,10 +4,42 @@ class Message:
     """
     A simple class for parsing messages with this format:
     {
-        cmd:send, 
-        src:GUI, 
-        dst:GestorArc, 
-        msg:”Log:13/11/2020-08:00->Error en App1”
+        'cmd': 
+            'info' (request) |
+            'send' (answer)  |
+            'stop' (spot system)
+        'src': 
+            'GUI' |
+            'KERNEL', |
+            'FILE_MAN' |
+            'APP'
+        'dst': 
+            'GUI' |
+            'KERNEL', |
+            'FILE_MAN' |
+            'APP'
+        'msg': {
+            'body': str
+            'method': str
+            'params': 
+        }
+    }
+
+    example:
+    {
+        'cmd': 'info',
+        'src': 'GUI',
+        'dst': 'APP',
+        'msg': {
+            'body': ”Log:13/11/2020-08:00->Error en App1”
+            'method': 'prior'
+            'params': {
+                'pid': 123
+                'priority_id': -10
+            }
+
+        }
+
     }
     """
     def __init__(self, msg_string):
@@ -15,7 +47,7 @@ class Message:
         self.__cmd = msg_dict["cmd"]
         self.__src = msg_dict["src"]
         self.__dst = msg_dict["dst"]
-        self.__msg = str(msg_dict["msg"])
+        self.__msg = msg_dict["msg"]
 
     def get_cmd(self):
         return self.__cmd

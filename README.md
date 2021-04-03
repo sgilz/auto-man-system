@@ -20,6 +20,8 @@ cd <repo_root_dir>
 ```bash
 pip3 install -e . #Do not dismiss the dot (.)
 ```
+
+5. Install *tk* with your package manager on your system for running graphic applications that use tkinter.
 ---
 
 ## Authors

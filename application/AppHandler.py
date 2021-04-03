@@ -91,7 +91,7 @@ class AppHandler:
                 processes.append({
                     'pid': pid, 
                     'name': name, 
-                    'create_time': create_time,
+                    'create_time': str(create_time),
                     'cores': cores,
                     'cpu_usage': cpu_usage,
                     'status': status,
@@ -102,7 +102,7 @@ class AppHandler:
 
         return json.dumps(processes)
 
-    def run(self, params = ["python", os.path.dirname(os.path.realpath(__file__))+"apps/GUI_app.py"] ):
+    def run(self, params = ["python", os.path.dirname(os.path.realpath(__file__))+"/apps/GUI_app.py"] ):
         """
         params: a list with the params to run on console
         examples: 
@@ -120,10 +120,11 @@ class AppHandler:
         if there is not process associated to the PID, 
         an error message is returned.
         """
-        priority_id = priority_id if -20 <= priority_id <= 19 else 0
         try:
             if pid in self.__processes:
                 process = psutil.Process(pid)
+                #since only superuser can decrease nice.
+                priority_id = priority_id if  process.nice() <= priority_id else process.nice()
                 process.nice(priority_id)
                 return "OK"
             else:
@@ -166,8 +167,10 @@ class AppHandler:
         """
         Terminates all of the running processes and closes the app
         """
-        for pid in self.__processes:
+        processes = self.__processes.copy() 
+        for pid in processes:
             self.terminate(pid)
+        self.__processes = processes
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process Viewer & Monitor")

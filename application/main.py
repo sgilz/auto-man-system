@@ -13,7 +13,6 @@ class Server:
         #main handler for control operations
         self.__app_handler = AppHandler()
         self.__app_handler.run() # run the initial subprocesses
-
         #socket service comands
         self.__BUFFER_SIZE = 1024
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,20 +40,26 @@ class Server:
                 print("\n# Closing connection")
                 self.__socket.close()
                 sys.exit()
-            except:
-                print(f"# Disconnected due interrupted connection. :(")
+            except Exception as e:
+                print(f"# Disconnected due interrupted connection. : {e}")
                 self.__socket.close()
                 sys.exit(1)
+            finally:
+                #self.__app_handler.terminate_all()
+                pass
+                
 
     def __session(self, client, address):
         print(f"# Connected: {address}")
         while True:
-            bin_msg = client.recv(self.__BUFFER_SIZE)
-            if bin_msg:
-                msg = msg.decode('UTF-8').replace('\n','') # convert to string (Python 3 only)
+            data = client.recv(self.__BUFFER_SIZE)
+            if data:
+                msg = data.decode('UTF-8').replace('\n','') # convert to string (Python 3 only)
                 print(f"< {address}: {msg}")
                 response = self.__execute(msg)
                 client.send(response.encode())
+                if "BYE" in response:
+                    sys.exit(0)
             else:
                 print(f"# Disconnected: {address}")
                 break
@@ -65,7 +70,7 @@ class Server:
         cmd = msg_obj.get_cmd()
         response = ""
         if cmd == "info":
-            body = json.loads(msg_obj.get_msg())
+            body = msg_obj.get_msg()
             method = body["method"]
             params = body["params"]
             if method == "stat":
@@ -80,12 +85,12 @@ class Server:
             else:
                 response = f"error: no such method {method}"
         elif cmd == "stop":
-            try:
-                self.__app_handler.terminate_all()
-                return "BYE"
-            finally:
-                sys.exit(0)
-        response_str = Message.format("send", "APP", msg_obj.get_src(), response)
+            self.__app_handler.terminate_all()
+            response = "BYE"
+        response_msg = {
+            "body":response
+        }
+        response_str = Message.format("send", "APP", msg_obj.get_src(), response_msg)
         return response_str
 
 if __name__ == "__main__":
