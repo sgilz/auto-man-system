@@ -1,11 +1,12 @@
 import json 
 import socket 
 import sys
-from filemanager.FileManager import FileManager
+from filemanager import FileManager
+from utils.Message import Message
 
 class Server:
     def __init__(self, address = None, port = 6542):
-        self.__file_manager = FileManager('Logs1.txt')
+        self.__file_manager = FileManager('Logs-1.log')
         self.__file_manager.createLog()
 
         #socket service comands
@@ -35,28 +36,75 @@ class Server:
                 print("\n# Closing connection")
                 self.__socket.close()
                 sys.exit()
-            except:
-                print(f"# Disconnected due interrupted connection. :(")
+            except Exception as e:
+                print(f"# Disconnected due interrupted connection. : {e}")
                 self.__socket.close()
                 sys.exit(1)
 
     def __session(self, client, address):
         print(f"# Connected: {address}")
         while True:
-            bin_msg = client.recv(self.__BUFFER_SIZE)
-            if bin_msg:
-                msg = msg.decode('UTF-8').replace('\n','') # convert to string (Python 3 only)
+            data = client.recv(self.__BUFFER_SIZE)
+            if data:
+                msg = data.decode('UTF-8').replace('\n','') # convert to string (Python 3 only)
                 print(f"< {address}: {msg}")
                 response = self.__execute(msg)
                 client.send(response.encode())
+                if "BYE" in response:
+                    sys.exit(0)
             else:
                 print(f"# Disconnected: {address}")
                 break
         client.close()
     
     def __execute(self, msg):
-        pass
+        msg_obj = Message(msg)
+        cmd = msg_obj.get_cmd()
+        response = ""
+        if cmd == "info":
+            body = msg_obj.get_msg()
+            method = body['method']
+            params = body['params']
+            if method == "addLineLog":
+                infoLog = params["info"]  
+                response = self.__file_manager.addLineLog(infoLog)
+            elif method == "deleteLog":
+                response = self.__file_manager.deleteLogFile()
+            elif method == "readLogFile":
+                response = self.__file_manager.readLogFile()
+            elif method == "listLogs":
+                response = self.__file_manager.listLogs()
+            elif method == "createDir":
+                nameDir = params['nameDir']
+                response = self.__file_manager.createDir(nameDir)
+            elif method == "deleteDir":
+                nameDir = params['nameDir']
+                response = self.__file_manager.deleteDir(nameDir)
+            elif method == "addFileInDirectory":
+                nameDir = params['nameDir']
+                response = self.__file_manager.addFileInDirectory(nameDir)
+            elif method == "addLineInFileDirectory":
+                nameDir = params['nameDir']
+                info = params['info']
+                response = self.__file_manager.addLineInFileDirectory(nameDir, info)
+            elif method == "listDirectoriesInDirectory":
+                nameDir = params['nameDir']
+                response = self.__file_manager.listDirectoriesInDirectory(nameDir)
+            elif method == "setFileName":
+                fileName = params['fileName']
+                response = self.__file_manager.setFileName(fileName)
+            elif method == "getFileName":
+                response = self.__file_manager.getFileName()
+            else:
+                response = f"error: no such method {method}"
+        elif cmd == "stop":
+            response = "BYE"
+        response_msg = {
+            "body": response
+        }
 
+        response_str = Message.format("send", "FILE_MAN", msg_obj.get_src(), response_msg)
+        return response_str
 
 if __name__ == "__main__":
     server = Server()
