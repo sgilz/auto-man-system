@@ -170,7 +170,6 @@ class AppHandler:
         processes = self.__processes.copy() 
         for pid in processes:
             self.terminate(pid)
-        self.__processes = processes
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process Viewer & Monitor")

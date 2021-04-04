@@ -60,6 +60,7 @@ class Server:
     def __execute(self, msg):
         msg_obj = Message(msg)
         cmd = msg_obj.get_cmd()
+        src = msg_obj.get_src()
         response = ""
         if cmd == "info":
             body = msg_obj.get_msg()
@@ -97,8 +98,10 @@ class Server:
                 response = self.__file_manager.getFileName()
             else:
                 response = f"error: no such method {method}"
-        elif cmd == "stop":
+        elif cmd == "stop" and src == "KERNEL":
             response = "BYE"
+        else:
+            response = f"error: no such command {cmd} or access denied"
         response_msg = {
             "body": response
         }

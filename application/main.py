@@ -68,6 +68,7 @@ class Server:
     def __execute(self, msg):
         msg_obj = Message(msg)
         cmd = msg_obj.get_cmd()
+        src = msg_obj.get_src()
         response = ""
         if cmd == "info":
             body = msg_obj.get_msg()
@@ -82,11 +83,15 @@ class Server:
             elif method == "term":
                 pid = params["pid"]
                 response = self.__app_handler.terminate(pid)
+            elif method == "halt":
+                self.__app_handler.terminate_all()
             else:
                 response = f"error: no such method {method}"
-        elif cmd == "stop":
+        elif cmd == "stop" and src == "KERNEL":
             self.__app_handler.terminate_all()
             response = "BYE"
+        else:
+            response = f"error: no such command {cmd} or access denied"
         response_msg = {
             "body":response
         }
