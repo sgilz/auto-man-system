@@ -40,12 +40,161 @@ class Server:
         msg = Message.format(
             "send", 
             "GUI",
-            "KERNEL", 
+            "APP", 
+            {
+                "body": "",
+                "method": "stat",
+                "params": {
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def createDir(self, nameDir):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "FILE_MAN", 
+            {
+                "body": "",
+                "method": "createDir",
+                "params": {
+                    "nameDir": nameDir
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def deleteDir(self, nameDir):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "FILE_MAN", 
+            {
+                "body": "",
+                "method": "deleteDir",
+                "params": {
+                    "nameDir": nameDir
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+
+    def setFileName(self, fileName):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "FILE_MAN", 
+            {
+                "body": "",
+                "method": "setFileName",
+                "params": {
+                    "fileName": fileName
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def listLogs(self):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "FILE_MAN", 
+            {
+                "body": "",
+                "method": "listLogs",
+                "params": {
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def listDirectoriesInDirectory(self):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "FILE_MAN", 
+            {
+                "body": "",
+                "method": "listDirectoriesInDirectory",
+                "params": {
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def setPriority(self, priority_id):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "APP", 
+            {
+                "body": "",
+                "method": "prior",
+                "params": {
+                    "priority_id": priority_id
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def terminateProcess(self, pid):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "APP", 
             {
                 "body": "",
                 "method": "term",
                 "params": {
-                    "pid":96967
+                    "pid": pid
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def updateProcess(self):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "APP", 
+            {
+                "body": "",
+                "method": "stat",
+                "params": {
                 }
             })
         self.__kernel_socket.send(msg.encode())
