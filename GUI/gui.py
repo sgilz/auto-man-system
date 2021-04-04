@@ -92,12 +92,18 @@ def ListLogs():
 def ListLogsDirectory():
     logsArea2.insert(tkinter.END, 'List logs Directory \n')
 
+def stopProcess():
+    print('STOP!!!')
+
 
 button4 = tkinter.Button(tab2, text="List logs", command = ListLogs)
 button4.grid(column=3, row=0, padx=10, pady=8)
 
 button5 = tkinter.Button(tab2, text="List directory", command = ListLogsDirectory)
 button5.grid(column=3, row=1, padx=10, pady=8)
+
+button6 = tkinter.Button(tab2, text="Stop process", command = stopProcess)
+button6.grid(column=3, row=2, padx=10, pady=8)
 
 logsArea1 = tkinter.Text(tab2, height=15, width=50)
 logsArea1.grid(column=0, row=5, columnspan=2, rowspan=2, padx=10, pady=10)
