@@ -1,7 +1,7 @@
 import json 
 import socket 
 import sys
-from filemanager import FileManager
+from file_manager.filemanager import FileManager
 from utils.Message import Message
 
 class Server:
@@ -34,10 +34,12 @@ class Server:
                 self.__session(client, address)
             except KeyboardInterrupt:
                 print("\n# Closing connection")
+                client.close()
                 self.__socket.close()
                 sys.exit()
             except Exception as e:
                 print(f"# Disconnected due interrupted connection. : {e}")
+                client.close()
                 self.__socket.close()
                 sys.exit(1)
 
@@ -51,6 +53,8 @@ class Server:
                 response = self.__execute(msg)
                 client.send(response.encode())
                 if "BYE" in response:
+                    client.close()
+                    self.__socket.close()
                     sys.exit(0)
             else:
                 print(f"# Disconnected: {address}")
@@ -99,13 +103,12 @@ class Server:
             else:
                 response = f"error: no such method {method}"
         elif cmd == "stop" and src == "KERNEL":
-            response = "BYE"
+            response = "Closing due to KERNEL request. BYE"
         else:
             response = f"error: no such command {cmd} or access denied"
         response_msg = {
             "body": response
         }
-
         response_str = Message.format("send", "FILE_MAN", msg_obj.get_src(), response_msg)
         return response_str
 

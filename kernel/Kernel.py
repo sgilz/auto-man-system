@@ -22,5 +22,5 @@ class Kernel:
                 "info": info
             },
         }
-        return Message.format("send", msg_obj.get_src(), "FILE_MAN", msg)
+        return Message.format("info", msg_obj.get_src(), "FILE_MAN", msg)
 

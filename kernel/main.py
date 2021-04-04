@@ -68,10 +68,12 @@ class Server:
                 self.__session(client, address)
             except KeyboardInterrupt:
                 print("\n# Closing connection")
+                client.close()
                 self.__server_socket.close()
                 sys.exit()
-            except:
-                print(f"# Disconnected due interrupted connection. :(")
+            except Exception as e:
+                print(f"# Disconnected due interrupted connection. : {e}")
+                client.close()
                 self.__server_socket.close()
                 sys.exit(1)
 
@@ -83,6 +85,10 @@ class Server:
                 print(f"< {address}: {request}")
                 response = self.__execute(request)
                 client.send(response.encode())
+                if "Close. BYE" in response:
+                    client.close()
+                    self.__server_socket.close()
+                    sys.exit(0)
             else:
                 print(f"# Disconnected: {address}")
                 break
@@ -113,7 +119,23 @@ class Server:
                 response = Message.format("send", "KERNEL", request_obj.get_src(), response_msg)
         elif cmd == "stop":
             if dst == "KERNEL":
-                pass
+                #closing FILE_MAN
+                request = Message.format("stop", "KERNEL", "FILE_MAN", { "body": "Close. BYE"})
+                self.__file_man_socket.send(request.encode())
+                response = self.__file_man_socket.recv(self.__BUFFER_SIZE).decode('UTF-8').replace('\n','')
+                print(f"< {response}")
+                
+                #closing APP
+                request = Message.format("stop", "KERNEL", "APP", { "body": "Close. BYE" })
+                self.__app_socket.send(request.encode())
+                response = self.__app_socket.recv(self.__BUFFER_SIZE).decode('UTF-8').replace('\n','')
+                print(f"< {response}")
+
+                #send response to close GUI 
+                response = Message.format("stop", "KERNEL", "GUI", { "body": "Close. BYE" })
+
+                self.__app_socket.close()
+                self.__file_man_socket.close()
             else:
                 response_msg = {
                     "body":f"error: you cannot stop single modules"
@@ -125,12 +147,14 @@ class Server:
             }
             response = Message.format("send", "KERNEL", request_obj.get_src(), response_msg)
         
-        print(f"< {self.__address}: {response}")
-        #Send response log
-        response_obj = Message(response)
-        response_log = self.__kernel.generate_log(response_obj)
-        self.__file_man_socket.send(response_log.encode())
-        print("< response log response: " + self.__file_man_socket.recv(self.__BUFFER_SIZE).decode('UTF-8').replace('\n',''))
+        # it can be closed if the request cmd is 'stop'
+        if not self.__file_man_socket._closed:
+            print(f"< {self.__address}: {response}")
+            #Send response log
+            response_obj = Message(response)
+            response_log = self.__kernel.generate_log(response_obj)
+            self.__file_man_socket.send(response_log.encode())
+            print("< response log response: " + self.__file_man_socket.recv(self.__BUFFER_SIZE).decode('UTF-8').replace('\n',''))
         
         return response
 

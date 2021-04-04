@@ -12,7 +12,6 @@ class Server:
     def __init__(self, address = None, port = 6543):
         #main handler for control operations
         self.__app_handler = AppHandler()
-        self.__app_handler.run() # run the initial subprocesses
         #socket service comands
         self.__BUFFER_SIZE = 1024
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,18 +34,20 @@ class Server:
                 client, address = self.__socket.accept()
                 # Start a session with the client
                 # in this case, we'll pretend this is a processed server
+                self.__app_handler.run() # run the initial subprocesses
                 self.__session(client, address)
             except KeyboardInterrupt:
                 print("\n# Closing connection")
+                client.close()
                 self.__socket.close()
                 sys.exit()
             except Exception as e:
                 print(f"# Disconnected due interrupted connection. : {e}")
+                client.close()
                 self.__socket.close()
                 sys.exit(1)
             finally:
-                #self.__app_handler.terminate_all()
-                pass
+                self.__app_handler.terminate_all()
                 
 
     def __session(self, client, address):
@@ -59,6 +60,8 @@ class Server:
                 response = self.__execute(msg)
                 client.send(response.encode())
                 if "BYE" in response:
+                    client.close()
+                    self.__socket.close()
                     sys.exit(0)
             else:
                 print(f"# Disconnected: {address}")
@@ -85,11 +88,15 @@ class Server:
                 response = self.__app_handler.terminate(pid)
             elif method == "halt":
                 self.__app_handler.terminate_all()
+                response = "All processes have been terminated"
+            elif method == "launch":
+                self.__app_handler.run()
+                response = "Processes running"
             else:
                 response = f"error: no such method {method}"
         elif cmd == "stop" and src == "KERNEL":
             self.__app_handler.terminate_all()
-            response = "BYE"
+            response = "Closing due to KERNEL request. BYE"
         else:
             response = f"error: no such command {cmd} or access denied"
         response_msg = {
