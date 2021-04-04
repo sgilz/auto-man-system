@@ -4,9 +4,12 @@ import socket
 from utils.Message import Message
 
 class Server:
+    """
+    A class which manages 
+    """
+    def __init__(self, address = None, port = 6541):
 
-    def __init__(self):
-
+        #socket service comands
         self.__BUFFER_SIZE = 1024
         self.__server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -15,28 +18,39 @@ class Server:
 
     def start(self):
         """
-        Connections
+        Connects to each module (FILE and APP) and start listening on server socket
         """
         self.__connect()
+        self.__session()
 
     def __connect(self):
-        """
-        Connection to KERNEL
-        """
+        #Connecting to APP socket
         try:
             print(f"# Connecting to KERNEL on {self.__address}:{self.__app_port}")
             self.__kernel_socket.connect((self.__address, self.__app_port))
             print("# Connected!")
-        except ConnectionRefusedError as e:
-            print(f"# Connection refused, please make sure all of the servers are running: {e}")
+        except ConnectionRefusedError:
+            print(f"# Connection refused, please make sure there's a server running.")
             sys.exit(1)
         except InterruptedError as e:
             print(f"# Connection interrupted: {e}")
             sys.exit(1)
 
-    def __execute(self, request):
-        pass
-
-if __name__ == "__main__":
-    client = Server()
-    client.start()
+    def __session(self):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "KERNEL", 
+            {
+                "body": "",
+                "method": "term",
+                "params": {
+                    "pid":96967
+                }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
