@@ -1,6 +1,8 @@
 import tkinter 
 from tkinter import ttk
 
+from main.Server import Server
+
 window = tkinter.Tk()
 window.title('GUI')
 window.geometry('1000x450')
@@ -35,7 +37,7 @@ tv.insert('', 'end', value=(
 def cambiarPrioridadProceso():
     if len(namePid.get()) > 0 and len(namePriority.get()) > 0:
         if int(namePriority.get()):
-            pass
+            Server.setPriority(namePriority.get(), namePid.get())
 
 labelNamePid = ttk.Label(tab1, text = "Pid:")
 labelNamePid.pack()

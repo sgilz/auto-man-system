@@ -148,7 +148,7 @@ class Server:
             print("< " + line )
         else: raise InterruptedError
 
-    def setPriority(self, priority_id):
+    def setPriority(self, priority_id, pid):
         msg = Message.format(
             "send", 
             "GUI",
@@ -157,7 +157,8 @@ class Server:
                 "body": "",
                 "method": "prior",
                 "params": {
-                    "priority_id": priority_id
+                    "priority_id": priority_id,
+                    "pid": pid
                 }
             })
         self.__kernel_socket.send(msg.encode())
@@ -196,6 +197,23 @@ class Server:
                 "method": "stat",
                 "params": {
                 }
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def stopProcess(self):
+        msg = Message.format(
+            "send", 
+            "GUI",
+            "KERNEL", 
+            {
+                "body": None,
+                "method": None,
+                "params": None
             })
         self.__kernel_socket.send(msg.encode())
         data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
