@@ -33,7 +33,23 @@ tv.insert('', 'end', value=(
 ))
 
 def cambiarPrioridadProceso():
-    pass
+    if len(namePid.get()) > 0 and len(namePriority.get()) > 0:
+        if int(namePriority.get()):
+            pass
+
+labelNamePid = ttk.Label(tab1, text = "Pid:")
+labelNamePid.pack()
+
+namePid = tkinter.StringVar()
+namePidEntered = ttk.Entry(tab1, width = 15, textvariable = namePid)
+namePidEntered.pack()
+
+labelNamePriority = ttk.Label(tab1, text = "Priority (1 - 19):")
+labelNamePriority.pack()
+
+namePriority = tkinter.StringVar()
+namePriorityEntered = ttk.Entry(tab1, width = 15, textvariable = namePriority)
+namePriorityEntered.pack()
 
 button7 = tkinter.Button(tab1, text="Cambiar prioridad proceso", command = cambiarPrioridadProceso)
 button7.pack()
