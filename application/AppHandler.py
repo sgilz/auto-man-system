@@ -109,9 +109,10 @@ class AppHandler:
         ['python3', '-m', 'venv', 'env'] 
         ["/usr/bin/python", "-c", "print('hello')"]
         """
-        for _ in range(2):
-            p = psutil.Popen(params, stdout=PIPE)
-            self.__processes.append(p.pid)
+        if not self.__processes:
+            for _ in range(2):
+                p = psutil.Popen(params, stdout=PIPE)
+                self.__processes.append(p.pid)
 
     def set_priority(self, priority_id, pid):
         """
@@ -170,7 +171,6 @@ class AppHandler:
         processes = self.__processes.copy() 
         for pid in processes:
             self.terminate(pid)
-        self.__processes = processes
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process Viewer & Monitor")

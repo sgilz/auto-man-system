@@ -43,6 +43,7 @@ class Message:
     }
     """
     def __init__(self, msg_string):
+        self.__msg_string = msg_string
         msg_dict = json.loads(msg_string)
         self.__cmd = msg_dict["cmd"]
         self.__src = msg_dict["src"]
@@ -72,6 +73,9 @@ class Message:
 
     def set_msg(self, msg):
         self.__msg = msg
+
+    def __str__(self):
+        return self.__msg_string
     
     @staticmethod
     def format(cmd, src, dst, msg):
