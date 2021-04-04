@@ -12,7 +12,9 @@ tab_control = ttk.Notebook(window)
 tab1 = ttk.Frame(tab_control)
 tab_control.add(tab1, text="Process")
 
-tv = ttk.Treeview(tab1, columns=(1,2,3,4,5,6,7,8,9), show="headings", height="5")
+
+
+tv = ttk.Treeview(tab1, columns=(1,2,3,4,5,6,7,8,9), show="headings", height="8")
 tv.pack()
 
 tv.heading(1, text="Pid")
@@ -29,6 +31,24 @@ tv.insert('', 'end', value=(
     "hola",
     "mundo"
 ))
+
+def cambiarPrioridadProceso():
+    pass
+
+button7 = tkinter.Button(tab1, text="Cambiar prioridad proceso", command = cambiarPrioridadProceso)
+button7.pack()
+
+def terminarProceso():
+    pass
+
+button8 = tkinter.Button(tab1, text="Terminar proceso", command = terminarProceso)
+button8.pack()
+
+def actualizarTabla():
+    pass
+
+button8 = tkinter.Button(tab1, text="Actualizar tablas", command = actualizarTabla)
+button8.pack()
 
 #Tab2
 tab2 = ttk.Frame(tab_control)
@@ -57,10 +77,10 @@ button1.grid(column=0, row=2, padx=8, pady=8)
 def createDirectory():
     if len(nameCreateDirectory.get()) > 0:
         labelCreateDirectory.configure(text= 'Directory ' + nameCreateDirectory.get() + '\n created')
- 
+
 labelCreateDirectory = ttk.Label(tab2, text = "Create new directory")
 labelCreateDirectory.grid(column = 1, row = 0, pady=8)
- 
+
 nameCreateDirectory = tkinter.StringVar()
 nameCreateDirectoryEntered = ttk.Entry(tab2, width = 15, textvariable = nameCreateDirectory)
 nameCreateDirectoryEntered.grid(column = 1, row = 1)
@@ -73,10 +93,10 @@ button2.grid(column=1, row=2, padx=10, pady=8)
 def deleteDirectory():
     if len(nameDeleteDirectory.get()) > 0:
         labelDeleteDirectory.configure(text= 'Directory ' + nameDeleteDirectory.get() + '\n deleted')
- 
+
 labelDeleteDirectory = ttk.Label(tab2, text = "Delete directory")
 labelDeleteDirectory.grid(column = 2, row = 0, pady=8)
- 
+
 nameDeleteDirectory = tkinter.StringVar()
 nameDeleteDirectoryEntered = ttk.Entry(tab2, width = 15, textvariable = nameDeleteDirectory)
 nameDeleteDirectoryEntered.grid(column = 2, row = 1)
