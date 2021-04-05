@@ -35,7 +35,7 @@ class FileManager:
         response = []
         for line in lines:
             response.append("{}".format(line.strip()))
-        return json.dumps(response).replace("\\\\","\\")
+        return response
 
     def listLogs(self):
         return "Logs listed"

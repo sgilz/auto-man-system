@@ -13,15 +13,15 @@ class Kernel:
         Generates logs based on incoming messages.
         """
         date = str(datetime.now())
-        msg_str = str(msg_obj)
-        info = f"Log: {date} -> {msg_str}"
+        cmd = msg_obj.get_cmd()
+        src = msg_obj.get_src()
+        dst = msg_obj.get_dst()
+        info = f"Log: {date} -> cmd:{cmd}, src:{src}, dst: {dst}"
         msg = {
             "method": "addLineLog",
             "params":{
                 "info": info
             },
         }
-        print("BUENAS" + msg_str)
-        print("TARDES" + info)
-        return Message.format("info", msg_obj.get_src(), "FILE_MAN", msg)
+        return Message.format("info", msg_obj.get_src(), "FILE_MAN", msg).replace("\\", "")
 

@@ -70,11 +70,15 @@ class Server:
                 print("\n# Closing connection")
                 client.close()
                 self.__server_socket.close()
+                self.__app_socket.close()
+                self.__file_man_socket.close()
                 sys.exit()
             except Exception as e:
                 print(f"# Disconnected due interrupted connection. : {e}")
                 client.close()
                 self.__server_socket.close()
+                self.__app_socket.close()
+                self.__file_man_socket.close()
                 sys.exit(1)
 
     def __session(self, client, address):
@@ -156,7 +160,6 @@ class Server:
             #Send response log
             response_obj = Message(response)
             response_log = self.__kernel.generate_log(response_obj)
-            print("HOLA" +response_log)
             self.__file_man_socket.send(response_log.encode())
             print("< response log response: " + self.__file_man_socket.recv(self.__BUFFER_SIZE).decode('UTF-8').replace('\n',''))
         

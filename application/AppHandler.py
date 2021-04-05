@@ -6,6 +6,7 @@ import time
 import os
 import argparse
 import json
+import sys
 
 class AppHandler:
     """
@@ -100,7 +101,7 @@ class AppHandler:
                     'username': username
                 })
 
-        return json.dumps(processes).replace("\\\\","\\")
+        return processes
 
     def run(self, params = ["python", os.path.dirname(os.path.realpath(__file__))+"/apps/GUI_app.py"] ):
         """
