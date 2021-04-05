@@ -71,8 +71,8 @@ class Server:
             method = body['method']
             params = body['params']
             if method == "addLineLog":
-                infoLog = params["info"]  
-                response = self.__file_manager.addLineLog(infoLog)
+                info = params['meta'] + json.dumps(params['info'])
+                response = self.__file_manager.addLineLog(info)
             elif method == "deleteLog":
                 response = self.__file_manager.deleteLogFile()
             elif method == "readLogFile":
@@ -90,7 +90,7 @@ class Server:
                 response = self.__file_manager.addFileInDirectory(nameDir)
             elif method == "addLineInFileDirectory":
                 nameDir = params['nameDir']
-                info = params['info']
+                info = params['meta'] + json.dumps(params['info'])
                 response = self.__file_manager.addLineInFileDirectory(nameDir, info)
             elif method == "listDirectoriesInDirectory":
                 nameDir = params['nameDir']

@@ -1,5 +1,6 @@
 from datetime import datetime
 from utils.Message import Message
+import json
 
 class Kernel:
     """
@@ -13,14 +14,12 @@ class Kernel:
         Generates logs based on incoming messages.
         """
         date = str(datetime.now())
-        cmd = msg_obj.get_cmd()
-        src = msg_obj.get_src()
-        dst = msg_obj.get_dst()
-        info = f"Log: {date} -> cmd:{cmd}, src:{src}, dst: {dst}"
+        meta = f"Log: {date} -> "
         msg = {
             "method": "addLineLog",
             "params":{
-                "info": info
+                "meta": meta,
+                "info": json.loads(str(msg_obj))
             },
         }
         return Message.format("info", msg_obj.get_src(), "FILE_MAN", msg).replace("\\", "")
