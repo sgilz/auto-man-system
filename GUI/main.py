@@ -50,7 +50,7 @@ class Client:
             print("< " + line )
             response = Message(line)
             msge = response.get_msg()
-            body = json.loads(msge["body"])
+            body = msge["body"]
             return [tuple(d.values()) for d in body ]
         else: raise InterruptedError
 
