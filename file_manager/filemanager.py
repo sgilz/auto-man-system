@@ -34,7 +34,7 @@ class FileManager:
         lines = lines[-2:] if len(lines) > 2 else lines
         response = []
         for line in lines:
-            response.append("{}".format(line.strip()))
+            response.append(json.loads(line.strip()))
         return response
 
     def listLogs(self):
