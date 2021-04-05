@@ -1,4 +1,5 @@
 import os
+import json
 
 class FileManager:
     """
@@ -30,16 +31,13 @@ class FileManager:
         file = open("%s/logs/%s" %(self.root, self.file), 'r')
         lines = file.readlines()
 
-        count = 0
-        lines = lines[-10:] if len(lines) > 10 else lines
+        lines = lines[-2:] if len(lines) > 2 else lines
+        response = []
         for line in lines:
-            count += 1
-            print("[{}]: {}".format(count, line.strip()))
-        
-        return "Logs readed"
+            response.append("{}".format(line.strip()))
+        return json.dumps(response).replace("\\\\","\\")
 
     def listLogs(self):
-        os.system("ls %s/logs/" %(self.root))
         return "Logs listed"
 
     def createDir(self, nameDir):

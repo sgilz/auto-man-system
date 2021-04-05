@@ -13,7 +13,7 @@ class Server:
         #main handler for control operations
         self.__app_handler = AppHandler()
         #socket service comands
-        self.__BUFFER_SIZE = 1024
+        self.__BUFFER_SIZE = 2048
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #http_bind_address 
         address = socket.gethostname() if address == None else address #set default address it's not given

@@ -88,6 +88,6 @@ class Message:
             "dst": dst,
             "msg": msg
         }
-        return json.dumps(mgs_dict)
+        return json.dumps(mgs_dict).replace("\\\\","\\")
 
     

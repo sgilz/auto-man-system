@@ -13,7 +13,7 @@ class Server:
         self.__kernel = Kernel()
 
         #socket service comands
-        self.__BUFFER_SIZE = 1024
+        self.__BUFFER_SIZE = 2048
         self.__server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.__app_port = 6543
@@ -147,12 +147,16 @@ class Server:
             }
             response = Message.format("send", "KERNEL", request_obj.get_src(), response_msg)
         
+        body = request_obj.get_msg()
+        method = body['method']
+        
         # it can be closed if the request cmd is 'stop'
-        if not self.__file_man_socket._closed:
+        if not self.__file_man_socket._closed and method != "readLogFile":
             print(f"< {self.__address}: {response}")
             #Send response log
             response_obj = Message(response)
             response_log = self.__kernel.generate_log(response_obj)
+            print("HOLA" +response_log)
             self.__file_man_socket.send(response_log.encode())
             print("< response log response: " + self.__file_man_socket.recv(self.__BUFFER_SIZE).decode('UTF-8').replace('\n',''))
         

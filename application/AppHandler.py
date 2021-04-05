@@ -100,7 +100,7 @@ class AppHandler:
                     'username': username
                 })
 
-        return json.dumps(processes)
+        return json.dumps(processes).replace("\\\\","\\")
 
     def run(self, params = ["python", os.path.dirname(os.path.realpath(__file__))+"/apps/GUI_app.py"] ):
         """

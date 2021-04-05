@@ -10,7 +10,7 @@ class Server:
         self.__file_manager.createLog()
 
         #socket service comands
-        self.__BUFFER_SIZE = 1024
+        self.__BUFFER_SIZE = 2048
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #http_bind_address 
         address = socket.gethostname() if address == None else address #set default address it's not given
@@ -110,6 +110,7 @@ class Server:
             "body": response
         }
         response_str = Message.format("send", "FILE_MAN", msg_obj.get_src(), response_msg)
+        print("RES:  " + response)
         return response_str
 
 if __name__ == "__main__":

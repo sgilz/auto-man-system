@@ -1,7 +1,7 @@
 import tkinter 
 from tkinter import ttk
 
-from main.Server import Server
+from GUI.main import Client
 
 window = tkinter.Tk()
 window.title('GUI')
@@ -9,6 +9,9 @@ window.geometry('1000x450')
 
 
 tab_control = ttk.Notebook(window)
+
+client = Client()
+client.connect()
 
 #Tab1 
 tab1 = ttk.Frame(tab_control)
@@ -29,15 +32,13 @@ tv.heading(7, text="Nice")
 tv.heading(8, text="Memory Usage")
 tv.heading(9, text="Username")
 
-tv.insert('', 'end', value=(
-    "hola",
-    "mundo"
-))
+for process in client.status():
+    tv.insert('', 'end', value=process)
 
 def cambiarPrioridadProceso():
     if len(namePid.get()) > 0 and len(namePriority.get()) > 0:
         if int(namePriority.get()):
-            Server.setPriority(namePriority.get(), namePid.get())
+            client.setPriority(int(namePriority.get()), int(namePid.get()))
 
 labelNamePid = ttk.Label(tab1, text = "Pid:")
 labelNamePid.pack()
@@ -57,16 +58,32 @@ button7 = tkinter.Button(tab1, text="Cambiar prioridad proceso", command = cambi
 button7.pack()
 
 def terminarProceso():
-    pass
+    client.terminateProcess(int(namePid.get()))
 
 button8 = tkinter.Button(tab1, text="Terminar proceso", command = terminarProceso)
 button8.pack()
 
 def actualizarTabla():
-    pass
+    for i in tv.get_children():
+        tv.delete(i)
 
-button8 = tkinter.Button(tab1, text="Actualizar tablas", command = actualizarTabla)
-button8.pack()
+    for process in client.status():
+        tv.insert('', 'end', value=process)
+
+button9 = tkinter.Button(tab1, text="Actualizar tablas", command = actualizarTabla)
+button9.pack()
+
+def halt():
+    client.halt()
+
+button10 = tkinter.Button(tab1, text="Matar procesos", command = halt)
+button10.pack()
+
+def launch():
+    client.launch()
+
+button11 = tkinter.Button(tab1, text="Iniciar procesos", command = launch)
+button11.pack()
 
 #Tab2
 tab2 = ttk.Frame(tab_control)
@@ -77,6 +94,7 @@ tab_control.add(tab2, text="File Manager")
 # =================
 def changeFileName():
     if len(nameFileName.get()) > 0:
+        client.setFileName(nameFileName.get())
         labelFileName.configure(text= 'New File Name: \n' + nameFileName.get())
  
 labelFileName = ttk.Label(tab2, text = "File Name: Logs-1.log")
@@ -94,6 +112,7 @@ button1.grid(column=0, row=2, padx=8, pady=8)
 # =================
 def createDirectory():
     if len(nameCreateDirectory.get()) > 0:
+        client.createDir(nameCreateDirectory.get())
         labelCreateDirectory.configure(text= 'Directory ' + nameCreateDirectory.get() + '\n created')
 
 labelCreateDirectory = ttk.Label(tab2, text = "Create new directory")
@@ -110,6 +129,7 @@ button2.grid(column=1, row=2, padx=10, pady=8)
 # =================
 def deleteDirectory():
     if len(nameDeleteDirectory.get()) > 0:
+        client.deleteDir(nameDeleteDirectory.get())
         labelDeleteDirectory.configure(text= 'Directory ' + nameDeleteDirectory.get() + '\n deleted')
 
 labelDeleteDirectory = ttk.Label(tab2, text = "Delete directory")
@@ -124,30 +144,23 @@ button3.grid(column=2, row=2, padx=10, pady=8)
 
 # LS 
 # =================
-def ListLogs():
-    logsArea1.insert(tkinter.END, 'List logs \n')
-
-def ListLogsDirectory():
-    logsArea2.insert(tkinter.END, 'List logs Directory \n')
+def readLogFile():
+    logs = client.readLogFile()
+    for log in logs:
+        logsArea.insert(tkinter.END, log)
 
 def stopProcess():
-    print('STOP!!!')
+    client.stopProcess()
 
 
-button4 = tkinter.Button(tab2, text="List logs", command = ListLogs)
+button4 = tkinter.Button(tab2, text="List logs", command = readLogFile)
 button4.grid(column=3, row=0, padx=10, pady=8)
-
-button5 = tkinter.Button(tab2, text="List directory", command = ListLogsDirectory)
-button5.grid(column=3, row=1, padx=10, pady=8)
 
 button6 = tkinter.Button(tab2, text="Stop process", command = stopProcess)
 button6.grid(column=3, row=2, padx=10, pady=8)
 
-logsArea1 = tkinter.Text(tab2, height=15, width=50)
-logsArea1.grid(column=0, row=5, columnspan=2, rowspan=2, padx=10, pady=10)
-
-logsArea2 = tkinter.Text(tab2, height=15, width=50)
-logsArea2.grid(column=2, row=5, columnspan=2, rowspan=2, padx=10, pady=10)
+logsArea = tkinter.Text(tab2, height=15, width=50)
+logsArea.grid(column=0, row=5, columnspan=2, rowspan=2, padx=10, pady=10)
 
 
 #Complete config tabs

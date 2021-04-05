@@ -1,33 +1,29 @@
 import os
 import sys
 import socket
+import json
 from utils.Message import Message
 
-class Server:
+class Client:
     """
     A class which manages 
     """
     def __init__(self, address = None, port = 6541):
 
         #socket service comands
-        self.__BUFFER_SIZE = 1024
-        self.__server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__BUFFER_SIZE = 2048
 
-        self.__kernel_port = 6541
+        self.__kernel_port = port
         self.__kernel_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def start(self):
-        """
-        Connects to each module (FILE and APP) and start listening on server socket
-        """
-        self.__connect()
-        self.__session()
+        self.__address = socket.gethostname() if address == None else address 
 
-    def __connect(self):
+
+    def connect(self):
         #Connecting to APP socket
         try:
-            print(f"# Connecting to KERNEL on {self.__address}:{self.__app_port}")
-            self.__kernel_socket.connect((self.__address, self.__app_port))
+            print(f"# Connecting to KERNEL on {self.__address}:{self.__kernel_port}")
+            self.__kernel_socket.connect((self.__address, self.__kernel_port))
             print("# Connected!")
         except ConnectionRefusedError:
             print(f"# Connection refused, please make sure there's a server running.")
@@ -36,9 +32,9 @@ class Server:
             print(f"# Connection interrupted: {e}")
             sys.exit(1)
 
-    def __session(self):
+    def status(self):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "APP", 
             {
@@ -52,11 +48,15 @@ class Server:
         if data:
             line = data.decode('UTF-8')    # convert to string (Python 3 only)
             print("< " + line )
+            response = Message(line)
+            msge = response.get_msg()
+            body = json.loads(msge["body"])
+            return [tuple(d.values()) for d in body ]
         else: raise InterruptedError
 
     def createDir(self, nameDir):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "FILE_MAN", 
             {
@@ -75,7 +75,7 @@ class Server:
 
     def deleteDir(self, nameDir):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "FILE_MAN", 
             {
@@ -95,7 +95,7 @@ class Server:
 
     def setFileName(self, fileName):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "FILE_MAN", 
             {
@@ -112,14 +112,14 @@ class Server:
             print("< " + line )
         else: raise InterruptedError
 
-    def listLogs(self):
+    def readLogFile(self):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "FILE_MAN", 
             {
                 "body": "",
-                "method": "listLogs",
+                "method": "readLogFile",
                 "params": {
                 }
             })
@@ -128,11 +128,15 @@ class Server:
         if data:
             line = data.decode('UTF-8')    # convert to string (Python 3 only)
             print("< " + line )
+            response = Message(line)
+            msge = response.get_msg()
+            return json.loads(msge["body"])
+            
         else: raise InterruptedError
 
     def listDirectoriesInDirectory(self):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "FILE_MAN", 
             {
@@ -150,7 +154,7 @@ class Server:
 
     def setPriority(self, priority_id, pid):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "APP", 
             {
@@ -170,7 +174,7 @@ class Server:
 
     def terminateProcess(self, pid):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "APP", 
             {
@@ -187,16 +191,32 @@ class Server:
             print("< " + line )
         else: raise InterruptedError
 
-    def updateProcess(self):
+    def halt(self):
         msg = Message.format(
-            "send", 
+            "info", 
             "GUI",
             "APP", 
             {
-                "body": "",
-                "method": "stat",
-                "params": {
-                }
+                "body": None,
+                "method": "halt",
+                "params": None
+            })
+        self.__kernel_socket.send(msg.encode())
+        data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
+        if data:
+            line = data.decode('UTF-8')    # convert to string (Python 3 only)
+            print("< " + line )
+        else: raise InterruptedError
+
+    def launch(self):
+        msg = Message.format(
+            "info", 
+            "GUI",
+            "APP", 
+            {
+                "body": None,
+                "method": "launch",
+                "params": None
             })
         self.__kernel_socket.send(msg.encode())
         data = self.__kernel_socket.recv(self.__BUFFER_SIZE)
@@ -207,7 +227,7 @@ class Server:
 
     def stopProcess(self):
         msg = Message.format(
-            "send", 
+            "stop", 
             "GUI",
             "KERNEL", 
             {

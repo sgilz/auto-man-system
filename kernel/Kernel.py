@@ -14,7 +14,6 @@ class Kernel:
         """
         date = str(datetime.now())
         msg_str = str(msg_obj)
-        msg = msg_obj.get_msg()
         info = f"Log: {date} -> {msg_str}"
         msg = {
             "method": "addLineLog",
@@ -22,5 +21,7 @@ class Kernel:
                 "info": info
             },
         }
+        print("BUENAS" + msg_str)
+        print("TARDES" + info)
         return Message.format("info", msg_obj.get_src(), "FILE_MAN", msg)
 
